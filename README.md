@@ -6,7 +6,7 @@ Además, se mostrará la temperatura actual y la estación del año en un displa
 Ingrid Natalia Ely
 
 # PARCIAL :  Sistema de incendio 
-![Sin título](![Sin título](https://github.com/IngridNataliaEly/ParcialSPD_2/assets/108601149/2d262c73-2e78-4fb6-a509-7a82e77b52e1)
+![Sin título](https://github.com/IngridNataliaEly/ParcialSPD_2/assets/108601149/2d262c73-2e78-4fb6-a509-7a82e77b52e1)
 
 
 ## Descripción
