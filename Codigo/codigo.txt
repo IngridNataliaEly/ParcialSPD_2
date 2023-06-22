@@ -1,0 +1,201 @@
+#include <IRremote.h>
+#include <LiquidCrystal_I2C.h>
+#include <Wire.h>
+#include <Servo.h>
+
+#define Tecla_1 0xEF10BF00
+#define Tecla_2 0xEE11BF00
+#define LED_ROJO 4
+#define LED_VERDE 3
+
+int IR = 11;
+int TMP = 0; // El sensor está conectado al pin analógico A0
+float temperatura = 0; // Leer datos del sensor
+const float tempPrimaveraMin = 15.0;
+const float tempPrimaveraMax = 25.0;
+const float tempVeranoMin = 25.0;
+const float tempVeranoMax = 35.0;
+const float tempOtonoMin = 10.0;
+const float tempOtonoMax = 20.0;
+const float tempInviernoMin = -41.0;
+const float tempInviernoMax = 10.0;
+bool encendido = false;
+bool volverLow = false;
+bool servoActivado = false;
+
+LiquidCrystal_I2C lcd(34, 16, 2); // Cambia la dirección I2C 0x27 según la dirección real de tu LCD
+Servo motor_9;
+
+void setup()
+{
+  pinMode(LED_ROJO, OUTPUT);
+  pinMode(LED_VERDE, OUTPUT);
+  motor_9.attach(9, 500, 25000);
+  lcd.init(); // Inicializar la pantalla LCD
+  lcd.backlight(); // Encender la retroiluminación de la pantalla LCD
+  Serial.begin(9600);
+  IrReceiver.begin(IR, DISABLE_LED_FEEDBACK);
+}
+
+unsigned long lastDeactivationTime = 0;
+const unsigned long debounceDelay = 1000; // Tiempo de espera en milisegundos después de desactivar la alarma
+
+void loop()
+{
+  control();
+
+  if (leerTemperatura() >= 40 || encendido)
+  {
+    if (!volverLow && (millis() - lastDeactivationTime > debounceDelay)) // Agrega la condición de temporizador
+    {
+      alertaTemperatura(HIGH);
+    }
+    else
+    {
+      volverLow = false; // Reinicia el valor de volverLow a falso
+      alertaTemperatura(LOW);
+    }
+  }
+  else if (leerTemperatura() < 40 || !encendido)
+  {
+    alertaTemperatura(LOW);
+    activarDesactivarServo(LOW);
+  }
+
+  delay(10);
+}
+
+float leerTemperatura()
+{
+  // Leer los valores del sensor TMP36
+  temperatura = map(analogRead(TMP), 0, 1023, -50, 450);
+
+  return temperatura;
+}
+
+void alertaTemperatura(int encendido)
+{
+  if (encendido == HIGH)
+  {
+    ledEncendidoApagado(1, 0); // Encender  el LED rojo. Apagar el LED verde
+    lcd.clear();
+    lcd.setCursor(0, 0); // Posiciona el cursor de escritura
+    lcd.print("ALERTA!MAX:");
+    lcd.print(temperatura);
+    activarDesactivarServo(HIGH);
+  }
+  else
+  {
+    ledEncendidoApagado(0, 1); // Apagar el LED rojo. Encender el LED verde
+     lcd.clear();
+    lcd.setCursor(0, 0); // Posiciona el cursor de escritura
+    lcd.print("Temperatura:");
+    lcd.print(temperatura);
+	
+    activarDesactivarServo(LOW);
+  }
+
+  switch (mostrarEstacion())
+  {
+    case 1:
+     
+      lcd.setCursor(0, 1); // Posiciona el cursor de escritura
+      lcd.print("Primavera");
+      break;
+    case 2:
+      lcd.setCursor(0, 1); // Posiciona el cursor de escritura
+      lcd.print("Verano");
+      break;
+    case 3:
+      lcd.setCursor(0, 1); // Posiciona el cursor de escritura
+      lcd.print("Otonio");
+      break;
+    case 4:
+      lcd.setCursor(0, 1); // Posiciona el cursor de escritura
+      lcd.print("Invierno");
+      break;
+    default:
+      lcd.setCursor(0, 1); // Posiciona el cursor de escritura
+      lcd.print("Esperando");
+      break;
+  }
+
+  Serial.println(mostrarEstacion());
+}
+
+void control()
+{
+  if (IrReceiver.decode())
+  {
+    Serial.println(IrReceiver.decodedIRData.decodedRawData, HEX);
+
+    if (IrReceiver.decodedIRData.decodedRawData == Tecla_1)
+    {
+      alertaTemperatura(HIGH);
+      encendido = true;
+    }
+
+    if (IrReceiver.decodedIRData.decodedRawData == Tecla_2 && (millis() - lastDeactivationTime > debounceDelay))
+    {
+      volverLow = true;
+      encendido = false;
+      lastDeactivationTime = millis(); // Actualiza el tiempo de desactivación
+    }
+
+    IrReceiver.resume();
+  }
+
+  delay(10);
+}
+
+void ledEncendidoApagado(int ledRojo, int ledVerde)
+{
+  digitalWrite(LED_ROJO, ledRojo);
+  digitalWrite(LED_VERDE, ledVerde);
+}
+
+void activarDesactivarServo(int estado)
+{
+  if (estado == HIGH && !servoActivado)
+  {
+    for (int i = 0; i <= 180; i++)
+    {
+      motor_9.write(i);
+      delay(10);
+    }
+    servoActivado = true;
+  }
+  else if (estado == LOW && servoActivado)
+  {
+    motor_9.write(0);
+    servoActivado = false;
+  }
+}
+
+int mostrarEstacion()
+{
+  // Determinar la estación del año
+  int estacion;
+  if (temperatura >= tempPrimaveraMin && temperatura <= tempPrimaveraMax)
+  {
+    estacion = 1;
+  }
+  else if (temperatura >= tempVeranoMin && temperatura <= tempVeranoMax)
+  {
+    estacion = 2;
+  }
+  else if (temperatura >= tempOtonoMin && temperatura <= tempOtonoMax)
+  {
+    estacion = 3;
+  }
+  else if (temperatura >= tempInviernoMin && temperatura <= tempInviernoMax)
+  {
+    estacion = 4;
+  }
+  else
+  {
+    estacion = 5;
+  }
+
+  return estacion;
+}
