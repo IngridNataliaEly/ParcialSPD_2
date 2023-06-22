@@ -244,4 +244,4 @@ El control remoto permite al usuario activar o desactivar la alarma y controlar 
 ![alarma encendida](https://github.com/IngridNataliaEly/ParcialSPD_2/assets/108601149/a984ca6a-5317-4521-9b2f-ebbd8f7ef28f)
 
 ## Enlace 
-[Parcial 2 SPD]([https://www.tinkercad.com/things/lnlCAm9TDYs](https://www.tinkercad.com/things/fx7wsHPQvJh?sharecode=rd6b8XcAruNTtT6XU7Ou2Cjx1vrN_RfxpAWrgZqncR8)https://www.tinkercad.com/things/fx7wsHPQvJh?sharecode=rd6b8XcAruNTtT6XU7Ou2Cjx1vrN_RfxpAWrgZqncR8)
+[Parcial 2 SPD](https://www.tinkercad.com/things/fx7wsHPQvJh?sharecode=rd6b8XcAruNTtT6XU7Ou2Cjx1vrN_RfxpAWrgZqncR8)
