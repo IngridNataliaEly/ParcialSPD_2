@@ -238,7 +238,8 @@ La pantalla LCD también muestra la estación del año correspondiente según la
 
 El control remoto permite al usuario activar o desactivar la alarma y controlar el servo motor según sea necesario.
 
-![alarma](https://github.com/IngridNataliaEly/ParcialSPD_2/assets/108601149/58269c0d-d670-40a1-b543-6584e2c7575e)
+![funcionamiento 1](https://github.com/IngridNataliaEly/ParcialSPD_2/assets/108601149/8727237a-a64e-405b-bc76-b6d0afc6ad02)
+
 
 ![alarma encendida](https://github.com/IngridNataliaEly/ParcialSPD_2/assets/108601149/a984ca6a-5317-4521-9b2f-ebbd8f7ef28f)
 
